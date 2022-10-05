@@ -93,11 +93,11 @@ public class Anagrams {
 
         List<String> used_words = new ArrayList<>();
 
-        while(!user_input.toLowerCase().equals(("stop")) && n > 0){
+        while(!user_input.toLowerCase().equals(("0")) && n > 0){
             System.out.print("Enter an anagram: ");
             user_input =sc.next();
 
-            if(user_input.toLowerCase().equals("stop")){
+            if(user_input.toLowerCase().equals("0")){
                 break;
             }
 
