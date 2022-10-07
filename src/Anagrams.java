@@ -88,7 +88,7 @@ public class Anagrams {
         Set<String> anagrams = new HashSet<>();
         int n = numOfAnagrams("", target_word, anagrams, words);
 
-        System.out.printf("Enter possible anagrams for '%s'\nEnter 'stop' to quit\n\n", target_word);
+        System.out.printf("Enter possible anagrams for '%s'\nEnter '0' to quit\n\n", target_word);
         String user_input ="";
 
         List<String> used_words = new ArrayList<>();
