@@ -106,10 +106,10 @@ public class Main {
         String YourWord;
         System.out.println("attempts in total: " + attempts);
         if (attempts > 1 && words_are_anagrams == 0) {
-            System.out.println("No anagrams exist for " + target + "!"); // Edge case
+            System.out.println("No anagrams exist for " + target + "!"); // Edge case.
         }
         else {
-            if (runs > 1) { // This exists because a bug exists in the round2() call.
+            if (runs > 1) { // This exists to prevent round2() from consuming an attempt.
                 YourWord = wordIn.nextLine();
                 String lower = YourWord.toLowerCase();
                 System.out.println("Run " + (runs));
