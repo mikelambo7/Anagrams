@@ -1,66 +1,75 @@
-import java.util.HashMap;
-import java.util.List;
 import java.util.*;
 import java.io.*;
+import static java.util.Arrays.sort;
 
+public class Main {
+    static Scanner wordIn = new Scanner(System.in);
 
-public class Anagrams {
-    public static Random rand = new Random();
-    public static Scanner sc = new Scanner(System.in);
+    static int runs = 1;
 
-    public static void main(String[] args){
-        List<String> words = readFile("anagrams_words.txt");
-        playGame(words);
+    public static void main(String[] args) throws IOException {
+        System.out.println("Welcome to the Anagrams game! Try to enter as many anagrams as you can think of.");
+        play();
     }
 
-    public static List<String> readFile(String filename){
-        List<String> words = new ArrayList<>();
-        try(Scanner sc = new Scanner(new File(filename))){
-            while(sc.hasNext()){
-                String word = sc.next();
-                words.add(word);
-            }
-        } catch (Exception e){
-            e.printStackTrace();
+    private static ArrayList<String> extract_file() throws IOException {
+        BufferedReader output;
+        output = new BufferedReader(new FileReader("all_words.txt"));
+        ArrayList<String> words = new ArrayList<>(List.of());
+        String line;
+        while ((line = output.readLine()) != null) {
+            words.add(line);
         }
         return words;
     }
 
-    public static boolean isAnagram(String word1, String word2, List<String> words){
-        if(words.contains(word1) && words.contains(word2)) {
-            if (word1.isEmpty() && word2.isEmpty()) {
-                return false;
-            }
-            HashMap<Character, Integer> map = new HashMap<>();
-            for (int i = 0; i < word1.length(); i++) {
-                if (map.containsKey(word1.charAt(i))) {
-                    int value = map.get(word1.charAt(i));
-                    map.put(word1.charAt(i), value + 1);
-                } else {
-                    map.put(word1.charAt(i), 1);
-                }
-            }
-            for (int i = 0; i < word2.length(); i++) {
-                char key = word2.charAt(i);
-                if (!map.containsKey(key)) {
-                    return false;
-                }
-                if (map.containsKey(key)) {
-                    int val = map.get(key) - 1;
-                    map.put(key, val);
-                    if (map.get(key) == 0) {
-                        map.remove(key);
-                    }
-                }
-            }
-            if (map.isEmpty()) {
-                return true;
-            }else{return false;}
-        }
-        return false;
+    private static String input(String wordIn) {
+        return wordIn;
     }
 
-    public static int numOfAnagrams(String str, String word, Set<String> anagrams, List<String> words) {
+    private static String GetWord() throws IOException {
+        Random randint = new Random();
+        String word1;
+        word1 = extract_file().get(randint.nextInt(extract_file().size()));
+        return word1;
+    }
+
+    private static int fact(int number) {
+        int f = 1;
+        int j = 1;
+        while(j <= number) {
+            f = f * j;
+            j++;
+        }
+        return f;
+    }
+
+    private static int letters(String w) {
+        String[] word = w.split("");
+        ArrayList<Object> letter = new ArrayList<>();
+        for (int i = 0; i < word.length - 1; i++) {
+            if (!letter.contains(word[i])) {
+                letter.add(word[i]);
+            }
+        }
+        return letter.size();
+    }
+
+    private static int permutations(String w) {
+        int f = 1;
+        int j = 1;
+        int x = w.length();
+        int r = letters(w);
+        int result;
+        while(j <= x) {
+            f = f * j;
+            j++;
+        }
+        result = fact(x) / fact(x - r);
+        return result;
+        }
+
+    private static int anagram_words(String str, String word, Set<String> anagrams, List<String> words) {
         if (word.length() <= 1) {
             String formed_word = str+word;
             if(words.contains(formed_word)) {
@@ -71,76 +80,107 @@ public class Anagrams {
                 String a = word.substring(i, i + 1);
                 String b = word.substring(0, i);
                 String c = word.substring(i + 1);
-
-                numOfAnagrams(str + a, b + c, anagrams, words);
+                anagram_words(str + a, b + c, anagrams, words);
             }
         }
         return anagrams.size();
     }
 
-    public static void playGame(List<String> words){
-        int words_entered = 0;
-        int points_attained = 0;
-        String target_word = words.get(rand.nextInt(words.size()));
-
-        System.out.println("Welcome to the Anagram game! Your goal is to enter all the possible anagrams of a random word given to you.");
-        System.out.printf("Target word is '%s'\n\n", target_word);
-        Set<String> anagrams = new HashSet<>();
-        int n = numOfAnagrams("", target_word, anagrams, words);
-
-        System.out.printf("Enter possible anagrams for '%s'\nEnter '0' to quit\n\n", target_word);
-        String user_input ="";
-
-        List<String> used_words = new ArrayList<>();
-
-        while(!user_input.toLowerCase().equals(("0")) && n > 0){
-            System.out.print("Enter an anagram: ");
-            user_input =sc.next();
-
-            if(user_input.toLowerCase().equals("0")){
-                break;
-            }
-
-            if(used_words.contains(user_input)){
-                System.out.println("Word already entered, try again.\n");
-            }else{
-                if(isAnagram(user_input, target_word, words)){
-                    points_attained++;
-                    words_entered++;
-                    n--;
-                    System.out.println("Point! That is an anagram of the target word\n");
-                } else{
-                    words_entered++;
-                    System.out.println("No point! That is NOT an anagram of the target word\n");
-                }
-            }
-            System.out.printf("\nWords entered so far: %d\n", words_entered);
-            System.out.printf("Current points attained: %d\n", points_attained);
-            used_words.add(user_input);
-        }
-
-        if(n == 0){System.out.printf("Successfully entered all anagrams of '%s'\n", target_word);}
-
-        System.out.printf("\nTotal distinct words entered: %d\n", words_entered);
-        System.out.printf("Final score attained (correct anagrams entered): %d\n", points_attained);
-
-        playAgain(words);
+    private static String[] array2(String word) {
+        String[] array = input(word).split("");
+        sort(array);
+        return array;
     }
 
-    public static void playAgain(List<String> words){
-        System.out.print("\nWould you like to play again (Y or N)? ");
-        String answer = sc.next();
-        while(!(answer.equalsIgnoreCase("Y") || answer.equalsIgnoreCase("N"))){
-            System.out.println("Enter Y or N.");
-            System.out.print("Would you like to play again (Y or N)? ");
-            answer = sc.next();
+    public static void play() throws IOException {
+        int words = 0;
+        int score = 0;
+        List<String> file = extract_file();
+        String target = GetWord();
+        ArrayList<String> entered = new ArrayList<>();
+        System.out.println("Your target word is: " + target);
+        Set<String> anagrams = new HashSet<>();
+        int words_are_anagrams = anagram_words("", target, anagrams, file) - 1;
+        int attempts = permutations(target);
+        System.out.println("Words to type: " + words_are_anagrams);
+        String YourWord;
+        System.out.println("attempts in total: " + attempts);
+        if (attempts > 1 && words_are_anagrams == 0) {
+            System.out.println("No anagrams exist for " + target + "!"); // Edge case.
         }
-        if(answer.toUpperCase().equals("Y")){
-            System.out.println("-----------------------------------------------------------");
-            playGame(words);
+        else {
+            if (runs > 1) { // This exists to prevent round2() from consuming an attempt.
+                YourWord = wordIn.nextLine();
+                String lower = YourWord.toLowerCase();
+                System.out.println("Run " + (runs));
+            }
+            do {
+                System.out.println("\nEnter a word or press 0 to exit: ");
+                YourWord = wordIn.nextLine();
+                String lower = YourWord.toLowerCase();
+                System.out.println("\nYour word is " + lower);
+                String[] array = target.split("");
+                sort(array);
+                attempts -= 1;
+                if (Arrays.equals(array, array2(lower)) && !entered.contains(lower.toLowerCase()) &&
+                !Objects.equals(lower, target) && file.contains(lower)) {
+                    System.out.println("This word is an anagram! +1");
+                    words_are_anagrams -= 1;
+                    score += 1;
+                } else if (entered.contains(lower.toLowerCase())) {
+                    System.out.println("You already entered this word. +0");
+                } else if (Objects.equals(lower, target)) {
+                    System.out.println("This is the target word. +0");
+                } else if (!file.contains(lower) && Arrays.equals(array, array2(lower.toLowerCase()))) {
+                    System.out.println("This is not a word. +0");
+                } else if (lower.equals("0")) {
+                    System.out.println("Bye.");
+                    attempts = 0;
+                } else {
+                    System.out.println("This word is NOT an anagram. +0");
+                }
+                if (!Objects.equals(lower, "0")) {
+                    words += 1;
+                    entered.add(lower);
+                    System.out.println("Words you typed in: " + words);
+                    System.out.println("All words you entered: " + entered);
+                    System.out.println("\nYour current score: " + score);
+                }
+                System.out.println("attempts left: " + attempts);
+            } while (!YourWord.equals("0") && words_are_anagrams > 0 && attempts > 1);
+            System.out.println("\nAll words you entered: " + entered);
+            System.out.println("Total number of words you entered: " + words);
+            System.out.println("Game finished! Your final score is " + score);
+            if (attempts <= 0 && words_are_anagrams != 0) {
+            System.out.println("The game finished before you entered all possible anagrams of " + target + "!");
+            } else if (words_are_anagrams == 0 && attempts > 1) {
+                System.out.println("You did it! You entered all possible anagrams for " + target + "!\n");
+                System.out.println(
+                    """
+                    \\   /    ______     |       |        \\              /     _____     |\\    |   |
+                     \\ /    /      \\    |       |         \\            /        |       | \\   |   |
+                      |    |        |   |       |          \\    /\\    /         |       |  \\  |   |
+                      |    |        |    \\     /            \\  /  \\  /          |       |   \\ |   |
+                      |     \\______/      \\___/              \\/    \\/         _____     |    \\|   o""");
+            }
+            round2();
+        }
+    }
+
+    public static void round2() throws IOException {
+        System.out.print("\nWould you like to play again (1 or 0)? ");
+        String answer = wordIn.next();
+        while(!(answer.equalsIgnoreCase("1") || answer.equalsIgnoreCase("0"))){
+            System.out.println("Enter 1 for yes or 0 for no.");
+            System.out.print("Would you like to play again (1 for yes or 0 for no)? ");
+            answer = wordIn.next();
+        }
+        if(answer.equalsIgnoreCase("1")){
+            runs += 1;
+            System.out.println("\n================================================================\n");
+            play();
         }else{
             System.out.println("Thanks for playing!");
         }
     }
-
 }
