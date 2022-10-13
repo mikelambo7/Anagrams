@@ -76,7 +76,7 @@ public class Main {
                 anagrams.add(formed_word);
             }
         } else {
-            for (int i = 0; i < word.length(); i++) {
+            for (int i = 0; i < word.length(); i++) { // some performance issues while trying to find which words are anagrams of the target.
                 String a = word.substring(i, i + 1);
                 String b = word.substring(0, i);
                 String c = word.substring(i + 1);
